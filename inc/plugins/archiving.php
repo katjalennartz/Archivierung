@@ -161,7 +161,7 @@ function archiving_forumdisplay_thread()
 	$settings = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay', 'fid = ' . $fid));
 
 	$archivingButton = '';
-	//TODO: accountswitcher berücksichtigen
+
 	if ($settings['archiving_active']) {
 		if ($settings['archiving_isVisibleForUser']) {
 			if ($settings['archiving_inplay']) { //Berücksichtigung von anderen Szenenteilnehmern
@@ -172,7 +172,7 @@ function archiving_forumdisplay_thread()
 				$archivingButton = eval($templates->render('archivingButton'));
 			}
 		} elseif ($mybb->usergroup['canmodcp'] == 1) {
-			// $archivingButton = eval($templates->render('archivingButton'));
+			$archivingButton = eval($templates->render('archivingButton'));
 		}
 	}
 }
