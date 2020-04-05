@@ -1,5 +1,9 @@
 <?php
 
+$l['archiving_active'] = 'Standardarchivierung aktiviert';
+$l['archiving_editableUser'] = 'Verschiebbar für User:';
+$l['archive_inplayArchive'] = 'Inplayarchiv (wenn ja, muss bei Standardarchiv die übergeordnete Kategorie ausgewählt werden):';
+
 //Bestätigen Seite
 $l['archiving_submitpage_title'] = 'Thema archivieren';
 $l['archiving_submitpage_submit'] = 'Bestätigen';
