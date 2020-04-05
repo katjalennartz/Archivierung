@@ -15,7 +15,7 @@ __Funktionen für Admins__
 ## Voraussetzungen
 * FontAwesome muss eingebunden sein, andernfalls muss man die Icons in dem Template _archivingButton_ ersetzen
 * [Enhanced Account Switcher](http://doylecc.altervista.org/bb/downloads.php?dlid=26&cat=2) muss installiert sein 
-* [Inplaytracker 2.0](https://github.com/its-sparks-fly/Inplaytracker-2.0) muss installiert sein 
+* [Inplaytracker 2.0](https://github.com/its-sparks-fly/Inplaytracker-2.0) muss installiert sein
 
 ## Template-Änderungen
 __Neue globale Templates:__
