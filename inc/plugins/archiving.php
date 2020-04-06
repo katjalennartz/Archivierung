@@ -3,9 +3,6 @@ if (!defined("IN_MYBB")) {
 	die("Direct initialization of this file is not allowed.<br /><br />Please make sure IN_MYBB is defined.");
 }
 
-// $plugins->add_hook("admin_formcontainer_output_row", "archiving_box");
-// $plugins->add_hook("admin_forum_management_edit_commit", "archiving_commit");
-
 function archiving_info()
 {
 	return array(
@@ -119,12 +116,20 @@ function archiving_editForumBox($args)
 	global $lang, $form_container, $form, $mybb, $db;
 
 	$lang->load('archiving');
-
 	if ($args['title'] == $lang->misc_options && $lang->misc_options) {
-		$data = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay, archiving_defaultArchive', 'fid = ' . $mybb->get_input('fid')));
+		if ($mybb->get_input('action') == 'add') {
+			$data = array(
+				'archiving_active' => '0',
+				'archiving_defaultArchive' => 0,
+				'archiving_isVisibleForUser' => '0',
+				'archiving_inplay' => '0'
+			);
+		} else {
+			$data = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay, archiving_defaultArchive', 'fid = ' . $mybb->get_input('fid')));
+		}
 		$formcontent = array(
 			$lang->archiving_active . ':<br/>' . $form->generate_yes_no_radio('archive_active', $data['archiving_active']),
-			'<br><br><br>' . $lang->archiving_standardArchive . '<br />' . $form->generate_forum_select('archive_forum', (int)$data['archiving_defaultArchive'], array('id' => 'archive_forum')),
+			'<br><br><br>' . $lang->archiving_standardArchive . '<br />' . $form->generate_forum_select('archive_forum', (int) $data['archiving_defaultArchive'], array('id' => 'archive_forum')),
 			'<br>' . $lang->archiving_editableUser . ':<br/>' . $form->generate_yes_no_radio('archive_editableUser', $data['archiving_isVisibleForUser'],  array('id' => 'archive_editableUser')),
 			'<br><br><br>' . $lang->archive_inplayArchive . ':<br />' . $form->generate_yes_no_radio('archive_inplayArchive', $data['archiving_inplay']),
 		);
@@ -258,4 +263,3 @@ function getMonthName($month)
 		return 'Dezember';
 	}
 }
-
