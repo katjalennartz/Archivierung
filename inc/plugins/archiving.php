@@ -214,8 +214,8 @@ function archiving_misc()
 		$threadName = $db->fetch_array($db->simple_select('threads', 'subject', 'tid = ' . $tid))['subject'];
 
 		if ($settings['archiving_inplay']) { //wenn inplay nach richtiger kategorie suchen
-			$ipdate = $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $mybb->get_input('tid')))['ipdate'];
-			$archiveName = getMonthName(date('m', $ipdate)) . ' ' . date('Y', $ipdate);
+			$ipdate = explode(" ", $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $tid))['ipdate']);
+			$archiveName = $ipdate[1] . ' ' . $ipdate[2];
 			$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
 			if ($new_fid == null) {
@@ -230,35 +230,6 @@ function archiving_misc()
 
 		eval("\$page = \"" . $templates->get('archivingSubmitSite') . "\";");
 		output_page($page);
-	}
-}
-
-function getMonthName($month)
-{
-	if ($month == '01') {
-		return 'Januar';
-	} elseif ($month == '02') {
-		return 'Februar';
-	} elseif ($month == '03') {
-		return 'März';
-	} elseif ($month == '04') {
-		return 'April';
-	} elseif ($month == '05') {
-		return 'Mai';
-	} elseif ($month == '06') {
-		return 'Juni';
-	} elseif ($month == '07') {
-		return 'Juli';
-	} elseif ($month == '08') {
-		return 'August';
-	} elseif ($month == '09') {
-		return 'September';
-	} elseif ($month == '10') {
-		return 'Oktober';
-	} elseif ($month == '11') {
-		return 'November';
-	} elseif ($month == '12') {
-		return 'Dezember';
 	}
 }
 
