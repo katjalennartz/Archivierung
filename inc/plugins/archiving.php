@@ -162,19 +162,20 @@ function archiving_forumdisplay_thread()
 {
 	global $mybb, $archivingButton, $db, $fid, $templates, $thread;
 	$settings = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay', 'fid = ' . $fid));
-
+	$tid = $thread['tid'];
 	$archivingButton = '';
 
 	if ($settings['archiving_active']) {
 		if ($settings['archiving_isVisibleForUser']) {
 			if ($settings['archiving_inplay']) { //Berücksichtigung von anderen Szenenteilnehmern
-				if (strstr($thread['partners'], (string) $mybb->user['uid'])) {
+				if (isOtherAccIPThread($mybb->user['uid'], $thread['partners'])) {
 					$archivingButton = eval($templates->render('archivingButton'));
 				}
-			} elseif (isOtherAcc($mybb->user['uid'], $thread['uid']) || $thread['uid'] ==  $mybb->user['uid']) { //eigenes Thema
+			} elseif (isOtherAccThread($mybb->user['uid'], $thread['uid'])) { //eigenes Thema
 				$archivingButton = eval($templates->render('archivingButton'));
 			}
-		} elseif ($mybb->usergroup['canmodcp'] == 1) {
+		}
+		if ($mybb->usergroup['canmodcp'] == 1) {
 			$archivingButton = eval($templates->render('archivingButton'));
 		}
 	}
@@ -190,7 +191,6 @@ function archiving_misc()
 		if (isset($_POST['submit'])) {
 			$old_fid = $_POST['old_fid'];
 			$new_fid = $_POST['new_fid'];
-			var_dump($old_fid);
 			$update_array = array(
 				'fid' => $new_fid
 			);
@@ -201,7 +201,7 @@ function archiving_misc()
 			rebuild_forum_counters($old_fid);
 			rebuild_forum_counters($new_fid);
 
-			redirect('forumdisplay.php?fid=' . $_POST['aid'], $lang->archiving_submitpage_success);
+			redirect('forumdisplay.php?fid=' . $_POST['new_fid'], $lang->archiving_submitpage_success);
 		}
 
 		if (!isset($mybb->input['fid'])) //wenn Zugriff ohne fid ->  von außen
@@ -262,29 +262,45 @@ function getMonthName($month)
 	}
 }
 
-function isOtherAcc($ownUid, $threadUid)
+function isOtherAccThread($ownUid, $threadUid)
 {
-	global $db; 
-	$user = get_user($ownUid);
-	if ($user['as_uid'] != 0) {
-		$mainUid = $user['as_uid'];
-	} else {
-		$mainUid = $ownUid;
-	}
-		
-	$query = $db->simple_select('users', 'uid', 'as_uid = '. $mainUid);
-	$userArray = array();
-	array_push($userArray, $mainUid);
+	$uidArray = getUidArray($ownUid);
 
-	while($result = $db->fetch_array($query)){
-		if(!in_array($result['uid'], $userArray))
-			array_push($userArray, $result['uid']);
-	}
-
-	foreach($userArray as $uid){
+	foreach($uidArray as $uid){
 		if($uid == $threadUid){
 			return true;
 		}
 	}
 	return false;
+}
+
+function isOtherAccIPThread($ownUid, $partners)
+{
+	$uidArray = getUidArray($ownUid);
+	foreach($uidArray as $uid){
+		if(strstr($partners, $uid)){
+			return true;
+		}
+	}
+	return false;
+}
+
+function getUidArray($uid){
+	global $db; 
+	$user = get_user($uid);
+	if ($user['as_uid'] != 0) {
+		$mainUid = $user['as_uid'];
+	} else {
+		$mainUid = $uid;
+	}
+		
+	$query = $db->simple_select('users', 'uid', 'as_uid = '. $mainUid);
+	$uidArray = array();
+	array_push($uidArray, $mainUid);
+
+	while($result = $db->fetch_array($query)){
+		if(!in_array($result['uid'], $uidArray))
+			array_push($uidArray, $result['uid']);
+	}
+	return $uidArray;
 }
