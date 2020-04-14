@@ -161,8 +161,6 @@ $plugins->add_hook('forumdisplay_thread', 'archiving_forumdisplay_thread');
 function archiving_forumdisplay_thread()
 {
 	global $mybb, $archivingButton, $db, $fid, $templates, $thread;
-
-	$tid = $thread['tid'];
 	$settings = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay', 'fid = ' . $fid));
 
 	$archivingButton = '';
@@ -173,7 +171,7 @@ function archiving_forumdisplay_thread()
 				if (strstr($thread['partners'], (string) $mybb->user['uid'])) {
 					$archivingButton = eval($templates->render('archivingButton'));
 				}
-			} elseif ($thread['uid'] ==  $mybb->user['uid']) {
+			} elseif (isOtherAcc($mybb->user['uid'], $thread['uid']) || $thread['uid'] ==  $mybb->user['uid']) { //eigenes Thema
 				$archivingButton = eval($templates->render('archivingButton'));
 			}
 		} elseif ($mybb->usergroup['canmodcp'] == 1) {
@@ -262,4 +260,31 @@ function getMonthName($month)
 	} elseif ($month == '12') {
 		return 'Dezember';
 	}
+}
+
+function isOtherAcc($ownUid, $threadUid)
+{
+	global $db; 
+	$user = get_user($ownUid);
+	if ($user['as_uid'] != 0) {
+		$mainUid = $user['as_uid'];
+	} else {
+		$mainUid = $ownUid;
+	}
+		
+	$query = $db->simple_select('users', 'uid', 'as_uid = '. $mainUid);
+	$userArray = array();
+	array_push($userArray, $mainUid);
+
+	while($result = $db->fetch_array($query)){
+		if(!in_array($result['uid'], $userArray))
+			array_push($userArray, $result['uid']);
+	}
+
+	foreach($userArray as $uid){
+		if($uid == $threadUid){
+			return true;
+		}
+	}
+	return false;
 }
