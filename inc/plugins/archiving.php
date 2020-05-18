@@ -24,6 +24,33 @@ function archiving_install()
 	$db->write_query("ALTER TABLE " . TABLE_PREFIX . "forums ADD archiving_isVisibleForUser TINYINT(1) NOT NULL DEFAULT '0';");
 	$db->write_query("ALTER TABLE " . TABLE_PREFIX . "forums ADD archiving_inplay TINYINT(1) NOT NULL DEFAULT '0';");
 
+	//Einstellungen 
+	$setting_group = array(
+		'name' => 'archiving',
+		'title' => 'Automatische Archivierung',
+		'description' => 'Einstellungen für das Archivierungs-Plugin',
+		'isdefault' => 0
+	);
+	$gid = $db->insert_query("settinggroups", $setting_group);
+
+	$setting_array = array(
+		'archiving_type' => array(
+			'title' => 'Inplaydatum-Format',
+			'description' => 'Welches Format wird in der Tabelle threads für ipdate verwendet? (Timestamp ist eine lange Folge an Zahlen)',
+			'optionscode' => 'radio
+date=Datum
+timestamp=Timestamp',
+			'value' => 'date',
+		)
+	);
+
+	foreach ($setting_array as $name => $setting) {
+		$setting['name'] = $name;
+		$setting['gid'] = $gid;
+
+		$db->insert_query('settings', $setting);
+	}
+
 	$insert_array = array(
 		'title'        => 'archivingButton',
 		'template'    => $db->escape_string('<a href="misc.php?action=archiving&fid={$fid}&tid={$tid}" title="Thema archivieren"><i class="fas fa-archive"></i></a>'),
@@ -94,6 +121,8 @@ function archiving_uninstall()
 	if ($db->field_exists('archiving_inplay', 'forums'))
 		$db->drop_column('forums', 'archiving_inplay');
 
+	$db->delete_query('settings', "name IN('archiving_format')");
+    $db->delete_query('settinggroups', "name = 'archiving'");
 
 	rebuild_settings();
 }
@@ -168,7 +197,12 @@ function archiving_forumdisplay_thread()
 	if ($settings['archiving_active']) {
 		if ($settings['archiving_isVisibleForUser']) {
 			if ($settings['archiving_inplay']) { //Berücksichtigung von anderen Szenenteilnehmern
-				if (isOtherAccIPThread($mybb->user['uid'], $thread['partners'])) {
+				$partners = array();
+				$array = explode(',', $thread['partners']);
+				foreach ($array as $item) {
+					array_push($partners, $item);
+				}
+				if (in_array($mybb->user['uid'], $partners)) {
 					$archivingButton = eval($templates->render('archivingButton'));
 				}
 			} elseif (isOtherAccThread($mybb->user['uid'], $thread['uid'])) { //eigenes Thema
@@ -214,8 +248,15 @@ function archiving_misc()
 		$threadName = $db->fetch_array($db->simple_select('threads', 'subject', 'tid = ' . $tid))['subject'];
 
 		if ($settings['archiving_inplay']) { //wenn inplay nach richtiger kategorie suchen
-			$ipdate = explode(" ", $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $tid))['ipdate']);
+			$format = $mybb->settings['archiving_format'];
+			$archiveName;
+			if ($format == 'date') {
+				$ipdate = explode(" ", $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $tid))['ipdate']);
 			$archiveName = $ipdate[1] . ' ' . $ipdate[2];
+			} else {
+				$ipdate = $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $tid))['ipdate'];
+				$archiveName = getMonthName(date('m', $ipdate)) . ' ' . date('Y', $ipdate);
+			}
 			$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
 			if ($new_fid == null) {
@@ -237,41 +278,60 @@ function isOtherAccThread($ownUid, $threadUid)
 {
 	$uidArray = getUidArray($ownUid);
 
-	foreach($uidArray as $uid){
-		if($uid == $threadUid){
+	foreach ($uidArray as $uid) {
+		if ($uid == $threadUid) {
 			return true;
 		}
 	}
 	return false;
 }
 
-function isOtherAccIPThread($ownUid, $partners)
+function getUidArray($uid)
 {
-	$uidArray = getUidArray($ownUid);
-	foreach($uidArray as $uid){
-		if(strstr($partners, $uid)){
-			return true;
-		}
-	}
-	return false;
-}
-
-function getUidArray($uid){
-	global $db; 
+	global $db;
 	$user = get_user($uid);
 	if ($user['as_uid'] != 0) {
 		$mainUid = $user['as_uid'];
 	} else {
 		$mainUid = $uid;
 	}
-		
-	$query = $db->simple_select('users', 'uid', 'as_uid = '. $mainUid);
+
+	$query = $db->simple_select('users', 'uid', 'as_uid = ' . $mainUid);
 	$uidArray = array();
 	array_push($uidArray, $mainUid);
 
-	while($result = $db->fetch_array($query)){
-		if(!in_array($result['uid'], $uidArray))
+	while ($result = $db->fetch_array($query)) {
+		if (!in_array($result['uid'], $uidArray))
 			array_push($uidArray, $result['uid']);
 	}
 	return $uidArray;
+}
+
+function getMonthName($month)
+{
+	if ($month == '01') {
+		return 'Januar';
+	} elseif ($month == '02') {
+		return 'Februar';
+	} elseif ($month == '03') {
+		return 'März';
+	} elseif ($month == '04') {
+		return 'April';
+	} elseif ($month == '05') {
+		return 'Mai';
+	} elseif ($month == '06') {
+		return 'Juni';
+	} elseif ($month == '07') {
+		return 'Juli';
+	} elseif ($month == '08') {
+		return 'August';
+	} elseif ($month == '09') {
+		return 'September';
+	} elseif ($month == '10') {
+		return 'Oktober';
+	} elseif ($month == '11') {
+		return 'November';
+	} elseif ($month == '12') {
+		return 'Dezember';
+	}
 }
