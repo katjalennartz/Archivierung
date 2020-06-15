@@ -61,6 +61,15 @@ timestamp=Timestamp',
 	$db->insert_query("templates", $insert_array);
 
 	$insert_array = array(
+		'title'        => 'archivingButtonThread',
+		'template'    => $db->escape_string('<a href="misc.php?action=archiving&fid={$fid}&tid={$tid}" class="button" title="Thema archivieren"><i class="fas fa-archive"></i> Thema archivieren</a>'),
+		'sid'        => '-1',
+		'version'    => '',
+		'dateline'    => TIME_NOW
+	);
+	$db->insert_query("templates", $insert_array);
+
+	$insert_array = array(
 		'title'        => 'archivingSubmitSite',
 		'template'    => $db->escape_string('<html>
 		<head>
@@ -123,6 +132,7 @@ function archiving_uninstall()
 
 	$db->delete_query('settings', "name IN('archiving_format')");
 	$db->delete_query('settinggroups', "name = 'archiving'");
+	$db->delete_query("templates", "title IN('archivingButton', 'archivingSubmitSite', 'archivingButtonThread')");
 
 	rebuild_settings();
 }
@@ -131,12 +141,14 @@ function archiving_activate()
 {
 	include MYBB_ROOT . "/inc/adminfunctions_templates.php";
 	find_replace_templatesets("forumdisplay_thread", "#" . preg_quote('{$thread[\'multipage\']}') . "#i", '{$thread[\'multipage\']} {$archivingButton}');
+	find_replace_templatesets("showthread", "#" . preg_quote('{$newreply}') . "#i", '{$archivingButton} {$newreply}');
 }
 
 function archiving_deactivate()
 {
 	include MYBB_ROOT . "/inc/adminfunctions_templates.php";
 	find_replace_templatesets("forumdisplay_thread", "#" . preg_quote('{$archivingButton}') . "#i", '', 0);
+	find_replace_templatesets("showthread", "#" . preg_quote('{$archivingButton}') . "#i", '', 0);
 }
 
 $plugins->add_hook('admin_formcontainer_output_row', 'archiving_editForumBox');
@@ -185,34 +197,19 @@ function archiving_commit()
 	$cache->update_forums();
 }
 
-//Button in Forenansicht anzeigen
+//Button in Forenansicht und Beitragsansicht anzeigen
 $plugins->add_hook('forumdisplay_thread', 'archiving_forumdisplay_thread');
 function archiving_forumdisplay_thread()
 {
-	global $mybb, $archivingButton, $db, $fid, $templates, $thread;
-	$settings = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay', 'fid = ' . $fid));
-	$tid = $thread['tid'];
-	$archivingButton = '';
+	global $archivingButton, $thread;
+	$archivingButton = setArchivingButton($thread, 'archivingButton');
+}
 
-	if ($settings['archiving_active']) {
-		if ($settings['archiving_isVisibleForUser']) {
-			if ($settings['archiving_inplay']) { //Berücksichtigung von anderen Szenenteilnehmern
-				$partners = array();
-				$array = explode(',', $thread['partners']);
-				foreach ($array as $item) {
-					array_push($partners, $item);
-				}
-				if (isOtherAccIPThread($partners)) {
-					$archivingButton = eval($templates->render('archivingButton'));
-				}
-			} elseif (isOtherAccThread($thread['uid'])) { //eigenes Thema
-				$archivingButton = eval($templates->render('archivingButton'));
-			}
-		}
-		if ($mybb->usergroup['canmodcp'] == 1) {
-			$archivingButton = eval($templates->render('archivingButton'));
-		}
-	}
+$plugins->add_hook('showthread_start', 'archiving_showthread_start');
+function archiving_showthread_start()
+{
+	global $archivingButton, $thread;
+	$archivingButton = setArchivingButton($thread, 'archivingButtonThread');
 }
 
 $plugins->add_hook('misc_start', 'archiving_misc');
@@ -274,6 +271,8 @@ function archiving_misc()
 	}
 }
 
+
+// Hilfsfunktionen
 function isOtherAccThread($threadUid)
 {
 	$uidArray = getUidArray();
@@ -316,6 +315,41 @@ function getUidArray()
 			array_push($uidArray, $result['uid']);
 	}
 	return $uidArray;
+}
+
+function setArchivingButton($thread, $templateName){
+	global $db, $templates, $mybb;
+	$archivingButton = '';
+	$fid = $thread['fid'];
+	$tid = $thread['tid'];
+	$partnersString = $thread['partners'];
+	$settings = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay', 'fid = ' . $fid));
+
+	// für Fall eines Threads -> Partner-Uids bekommen
+	if($templateName == 'archivingButtonThread'){
+		$partnersString = $db->fetch_array($db->simple_select('threads', 'partners', 'tid = '. $tid))['partners'];
+	}
+
+	if ($settings['archiving_active']) {
+		if ($settings['archiving_isVisibleForUser']) {
+			if ($settings['archiving_inplay']) { //Berücksichtigung von anderen Szenenteilnehmern
+				$partners = array();
+				$array = explode(',', $partnersString);
+				foreach ($array as $item) {
+					array_push($partners, $item);
+				}
+				if (isOtherAccIPThread($partners)) {
+					$archivingButton = eval($templates->render($templateName));
+				}
+			} elseif (isOtherAccThread($thread['uid'])) { //eigenes Thema
+				$archivingButton = eval($templates->render($templateName));
+			}
+		}
+		if ($mybb->usergroup['canmodcp'] == 1) {
+			$archivingButton = eval($templates->render($templateName));
+		}
+	}
+	return $archivingButton;
 }
 
 function getMonthName($month)
