@@ -122,7 +122,7 @@ function archiving_uninstall()
 		$db->drop_column('forums', 'archiving_inplay');
 
 	$db->delete_query('settings', "name IN('archiving_format')");
-    $db->delete_query('settinggroups', "name = 'archiving'");
+	$db->delete_query('settinggroups', "name = 'archiving'");
 
 	rebuild_settings();
 }
@@ -202,10 +202,10 @@ function archiving_forumdisplay_thread()
 				foreach ($array as $item) {
 					array_push($partners, $item);
 				}
-				if (in_array($mybb->user['uid'], $partners)) {
+				if (isOtherAccIPThread($partners)) {
 					$archivingButton = eval($templates->render('archivingButton'));
 				}
-			} elseif (isOtherAccThread($mybb->user['uid'], $thread['uid'])) { //eigenes Thema
+			} elseif (isOtherAccThread($thread['uid'])) { //eigenes Thema
 				$archivingButton = eval($templates->render('archivingButton'));
 			}
 		}
@@ -252,7 +252,7 @@ function archiving_misc()
 			$archiveName;
 			if ($format == 'date') {
 				$ipdate = explode(" ", $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $tid))['ipdate']);
-			$archiveName = $ipdate[1] . ' ' . $ipdate[2];
+				$archiveName = $ipdate[1] . ' ' . $ipdate[2];
 			} else {
 				$ipdate = $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $tid))['ipdate'];
 				$archiveName = getMonthName(date('m', $ipdate)) . ' ' . date('Y', $ipdate);
@@ -274,9 +274,9 @@ function archiving_misc()
 	}
 }
 
-function isOtherAccThread($ownUid, $threadUid)
+function isOtherAccThread($threadUid)
 {
-	$uidArray = getUidArray($ownUid);
+	$uidArray = getUidArray();
 
 	foreach ($uidArray as $uid) {
 		if ($uid == $threadUid) {
@@ -286,9 +286,20 @@ function isOtherAccThread($ownUid, $threadUid)
 	return false;
 }
 
-function getUidArray($uid)
+function isOtherAccIPThread($partners)
 {
-	global $db;
+	$uidArray = getUidArray();
+	foreach ($uidArray as $uid) {
+		if (in_array($uid, $partners))
+			return true;
+	}
+	return false;
+}
+
+function getUidArray()
+{
+	global $db, $mybb;
+	$uid = $mybb->user['uid'];
 	$user = get_user($uid);
 	if ($user['as_uid'] != 0) {
 		$mainUid = $user['as_uid'];
