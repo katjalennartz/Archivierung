@@ -34,7 +34,7 @@ function archiving_install()
 	$gid = $db->insert_query("settinggroups", $setting_group);
 
 	$setting_array = array(
-		'archiving_type' => array(
+		'archiving_format' => array(
 			'title' => 'Inplaydatum-Format',
 			'description' => 'Welches Format wird in der Tabelle threads für ipdate verwendet? (Timestamp ist eine lange Folge an Zahlen)',
 			'optionscode' => 'radio
