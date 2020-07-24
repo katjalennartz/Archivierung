@@ -34,7 +34,7 @@ function archiving_install()
 	$gid = $db->insert_query("settinggroups", $setting_group);
 
 	$setting_array = array(
-		'archiving_format' => array(
+		'archiving_type' => array(
 			'title' => 'Inplaydatum-Format',
 			'description' => 'Welches Format wird in der Tabelle threads für ipdate verwendet? (Timestamp ist eine lange Folge an Zahlen)',
 			'optionscode' => 'radio
@@ -201,15 +201,17 @@ function archiving_commit()
 $plugins->add_hook('forumdisplay_thread', 'archiving_forumdisplay_thread');
 function archiving_forumdisplay_thread()
 {
-	global $archivingButton, $thread;
-	$archivingButton = setArchivingButton($thread, 'archivingButton');
+	global $archivingButton, $thread, $mybb;
+	if($mybb->user['uid'] != 0)
+		$archivingButton = setArchivingButton($thread, 'archivingButton');
 }
 
 $plugins->add_hook('showthread_start', 'archiving_showthread_start');
 function archiving_showthread_start()
 {
-	global $archivingButton, $thread;
-	$archivingButton = setArchivingButton($thread, 'archivingButtonThread');
+	global $archivingButton, $thread, $mybb;
+	if($mybb->user['uid'] != 0)
+		$archivingButton = setArchivingButton($thread, 'archivingButtonThread');
 }
 
 $plugins->add_hook('misc_start', 'archiving_misc');
@@ -245,7 +247,7 @@ function archiving_misc()
 		$threadName = $db->fetch_array($db->simple_select('threads', 'subject', 'tid = ' . $tid))['subject'];
 
 		if ($settings['archiving_inplay']) { //wenn inplay nach richtiger kategorie suchen
-			$format = $mybb->settings['archiving_format'];
+			$format = $mybb->settings['archiving_type'];
 			$archiveName;
 			if ($format == 'date') {
 				$ipdate = explode(" ", $db->fetch_array($db->simple_select('threads', 'ipdate', 'tid = ' . $tid))['ipdate']);
