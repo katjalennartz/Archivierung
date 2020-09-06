@@ -320,6 +320,8 @@ function getUidArray()
 function setArchivingButton($thread, $templateName){
 	global $templates;
 	if (isAllowed($thread)) {
+		$fid = $thread['fid'];
+		$tid = $thread['tid'];
 		return eval($templates->render($templateName));
 	} else{
 		return '';
