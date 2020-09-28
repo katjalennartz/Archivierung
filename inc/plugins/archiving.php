@@ -220,10 +220,6 @@ function archiving_misc()
 	global $lang, $db, $mybb, $templates, $theme, $headerinclude, $header, $footer, $cache;
 	$lang->load('archiving');
 	if ($mybb->input['action'] == 'archiving') {
-		$tid = $mybb->get_input('tid');
-		if($mybb->get_input('fid') == 0 || $tid == 0) error_no_permission();
-		$thread = get_thread($tid);
-		if(!isAllowed($thread)) error_no_permission();
 
 		//Annahme von Bestätigung
 		if (isset($_POST['submit'])) {
@@ -241,6 +237,11 @@ function archiving_misc()
 
 			redirect('forumdisplay.php?fid=' . $_POST['new_fid'], $lang->archiving_submitpage_success);
 		}
+
+		$tid = $mybb->get_input('tid');
+		if($mybb->get_input('fid') == 0 || $tid == 0) error_no_permission();
+		$thread = get_thread($tid);
+		if(!isAllowed($thread)) error_no_permission();
 
 		$old_fid = $mybb->get_input('fid');
 		$settings = $db->fetch_array($db->simple_select('forums', 'archiving_inplay, archiving_defaultArchive', 'fid = ' . $old_fid));
