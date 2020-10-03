@@ -28,11 +28,11 @@ __Veränderte Templates:__
 ## Anmerkung Inplayarchiv
 Ein Inplayarchiv ist in diesem Fall wie folgt definiert: Eine Forum enthält für jeden Monat ein eigenes Unterforum, welches nach dem Schema "Monatsname YYYY" definiert ist. Nur wenn diese Schreibweise eingehalten wurde, kann das Plugin automatisch zuweisen. Wenn eine alternative Schreibweise bevorzugt wird, müssen Änderungen in der PHP-Datei vorgenommen werden.
 
-![Archivierung Beispiel](https://beforestorm.de/imageUpload/plugins/archiving_example.png)
+![Archivierung Beispiel](https://aheartforspinach.de/upload/plugins/archiving_example.png)
 
 ## Vorschaubilder
 __Einstellungen in der Foren-Editieren-Seite__
-![Archivierung Einstellungen](https://beforestorm.de/imageUpload/plugins/archiving_settings.png)
+![Archivierung Einstellungen](https://aheartforspinach.de/upload/plugins/archiving_settings.png)
 
 __Ansicht im Forum__
-![Archivierung Forum](https://beforestorm.de/imageUpload/plugins/archiving_forum.png)
+![Archivierung Forum](https://aheartforspinach.de/upload/plugins/archiving_forum.png)
