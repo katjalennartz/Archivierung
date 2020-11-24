@@ -51,26 +51,34 @@ timestamp=Timestamp',
 		$db->insert_query('settings', $setting);
 	}
 
+	// create templates
+    $templategroup = array(
+        'prefix' => 'archiving',
+        'title' => $db->escape_string('Archivierung'),
+    );
+
+    $db->insert_query("templategroups", $templategroup);
+
 	$insert_array = array(
-		'title'        => 'archivingButton',
+		'title'        => 'archiving_Button',
 		'template'    => $db->escape_string('<a href="misc.php?action=archiving&fid={$fid}&tid={$tid}" title="Thema archivieren"><i class="fas fa-archive"></i></a>'),
-		'sid'        => '-1',
+		'sid'        => '-2',
 		'version'    => '',
 		'dateline'    => TIME_NOW
 	);
 	$db->insert_query("templates", $insert_array);
 
 	$insert_array = array(
-		'title'        => 'archivingButtonThread',
+		'title'        => 'archiving_ButtonThread',
 		'template'    => $db->escape_string('<a href="misc.php?action=archiving&fid={$fid}&tid={$tid}" class="button" title="Thema archivieren"><i class="fas fa-archive"></i> Thema archivieren</a>'),
-		'sid'        => '-1',
+		'sid'        => '-2',
 		'version'    => '',
 		'dateline'    => TIME_NOW
 	);
 	$db->insert_query("templates", $insert_array);
 
 	$insert_array = array(
-		'title'        => 'archivingSubmitSite',
+		'title'        => 'archiving_SubmitSite',
 		'template'    => $db->escape_string('<html>
 		<head>
 		<title>{$mybb->settings[\'bbname\']} - {$lang->archiving_submitpage_title}</title>
@@ -97,7 +105,7 @@ timestamp=Timestamp',
 		{$footer}
 		</body>
 		</html>'),
-		'sid'        => '-1',
+		'sid'        => '-2',
 		'version'    => '',
 		'dateline'    => TIME_NOW
 	);
@@ -132,7 +140,8 @@ function archiving_uninstall()
 
 	$db->delete_query('settings', "name IN('archiving_type')");
 	$db->delete_query('settinggroups', "name = 'archiving'");
-	$db->delete_query("templates", "title IN('archivingButton', 'archivingSubmitSite', 'archivingButtonThread')");
+	$db->delete_query("templategroups", 'prefix = "archiving"');
+    $db->delete_query("templates", "title like 'archiving_%'");
 
 	rebuild_settings();
 }
@@ -203,7 +212,7 @@ function archiving_forumdisplay_thread()
 {
 	global $archivingButton, $thread, $mybb;
 	if($mybb->user['uid'] != 0)
-		$archivingButton = setArchivingButton($thread, 'archivingButton');
+		$archivingButton = setArchivingButton($thread, 'archiving_Button');
 }
 
 $plugins->add_hook('showthread_start', 'archiving_showthread_start');
@@ -211,7 +220,7 @@ function archiving_showthread_start()
 {
 	global $archivingButton, $thread, $mybb;
 	if($mybb->user['uid'] != 0)
-		$archivingButton = setArchivingButton($thread, 'archivingButtonThread');
+		$archivingButton = setArchivingButton($thread, 'archiving_ButtonThread');
 }
 
 $plugins->add_hook('misc_start', 'archiving_misc');
@@ -267,7 +276,7 @@ function archiving_misc()
 
 		$infoText = $lang->sprintf($lang->archiving_submitpage_text, $thread['subject'], $archiveName);
 
-		eval("\$page = \"" . $templates->get('archivingSubmitSite') . "\";");
+		eval("\$page = \"" . $templates->get('archiving_SubmitSite') . "\";");
 		output_page($page);
 	}
 }
