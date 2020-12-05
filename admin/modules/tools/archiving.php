@@ -22,7 +22,7 @@ if ($_POST['archiving_update'] == 'Update') {
     // move templates from global to each style
     $db->update_query('templates', array('title' => 'archiving_button', 'sid' => -2), 'title = "archivingButton"');
     $db->update_query('templates', array('title' => 'archiving_buttonThread', 'sid' => -2), 'title = "archivingButtonThread"');
-    $db->update_query('templates', array('title' => 'archiving_submitSite', 'sid' => -2), 'title = "archiving_SubmitSite"');
+    $db->update_query('templates', array('title' => 'archiving_submitSite', 'sid' => -2), 'title = "archivingSubmitSite"');
 
     flash_message('Das Update wurde erfolgreich durchgeführt!', 'success');
 }

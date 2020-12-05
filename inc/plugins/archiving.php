@@ -33,7 +33,7 @@ function archiving_install()
     $db->insert_query("templategroups", $templategroup);
 
 	$insert_array = array(
-		'title'        => 'archiving_Button',
+		'title'        => 'archiving_button',
 		'template'    => $db->escape_string('<a href="misc.php?action=archiving&fid={$fid}&tid={$tid}" title="Thema archivieren"><i class="fas fa-archive"></i></a>'),
 		'sid'        => '-2',
 		'version'    => '',
@@ -42,7 +42,7 @@ function archiving_install()
 	$db->insert_query("templates", $insert_array);
 
 	$insert_array = array(
-		'title'        => 'archiving_ButtonThread',
+		'title'        => 'archiving_buttonThread',
 		'template'    => $db->escape_string('<a href="misc.php?action=archiving&fid={$fid}&tid={$tid}" class="button" title="Thema archivieren"><i class="fas fa-archive"></i> Thema archivieren</a>'),
 		'sid'        => '-2',
 		'version'    => '',
@@ -51,7 +51,7 @@ function archiving_install()
 	$db->insert_query("templates", $insert_array);
 
 	$insert_array = array(
-		'title'        => 'archiving_SubmitSite',
+		'title'        => 'archiving_submitSite',
 		'template'    => $db->escape_string('<html>
 		<head>
 		<title>{$mybb->settings[\'bbname\']} - {$lang->archiving_submitpage_title}</title>
@@ -183,7 +183,7 @@ function archiving_forumdisplay_thread()
 {
 	global $archivingButton, $thread, $mybb;
 	if($mybb->user['uid'] != 0)
-		$archivingButton = setArchivingButton($thread, 'archiving_Button');
+		$archivingButton = setArchivingButton($thread, 'archiving_button');
 }
 
 $plugins->add_hook('showthread_start', 'archiving_showthread_start');
@@ -191,7 +191,7 @@ function archiving_showthread_start()
 {
 	global $archivingButton, $thread, $mybb;
 	if($mybb->user['uid'] != 0)
-		$archivingButton = setArchivingButton($thread, 'archiving_ButtonThread');
+		$archivingButton = setArchivingButton($thread, 'archiving_buttonThread');
 }
 
 $plugins->add_hook('misc_start', 'archiving_misc');
@@ -228,7 +228,7 @@ function archiving_misc()
 
 		if ($settings['archiving_inplay']) { //wenn inplay nach richtiger kategorie suchen
 			$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = '. $tid), 'date');
-			setlocale (LC_TIME, 'de_DE');
+			setlocale(LC_TIME, 'german');
 			$archiveName = strftime ("%B %G", $ipdate);
 			$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
@@ -243,7 +243,7 @@ function archiving_misc()
 
 		$infoText = $lang->sprintf($lang->archiving_submitpage_text, $thread['subject'], $archiveName);
 
-		eval("\$page = \"" . $templates->get('archiving_SubmitSite') . "\";");
+		eval("\$page = \"" . $templates->get('archiving_submitSite') . "\";");
 		output_page($page);
 	}
 }
