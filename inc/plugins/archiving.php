@@ -24,33 +24,6 @@ function archiving_install()
 	$db->write_query("ALTER TABLE " . TABLE_PREFIX . "forums ADD archiving_isVisibleForUser TINYINT(1) NOT NULL DEFAULT '0';");
 	$db->write_query("ALTER TABLE " . TABLE_PREFIX . "forums ADD archiving_inplay TINYINT(1) NOT NULL DEFAULT '0';");
 
-	//Einstellungen 
-	$setting_group = array(
-		'name' => 'archiving',
-		'title' => 'Automatische Archivierung',
-		'description' => 'Einstellungen für das Archivierungs-Plugin',
-		'isdefault' => 0
-	);
-	$gid = $db->insert_query("settinggroups", $setting_group);
-
-	$setting_array = array(
-		'archiving_type' => array(
-			'title' => 'Inplaydatum-Format',
-			'description' => 'Welches Format wird in der Tabelle threads für ipdate verwendet? (Timestamp ist eine lange Folge an Zahlen)',
-			'optionscode' => 'radio
-date=Datum
-timestamp=Timestamp',
-			'value' => 'date',
-		)
-	);
-
-	foreach ($setting_array as $name => $setting) {
-		$setting['name'] = $name;
-		$setting['gid'] = $gid;
-
-		$db->insert_query('settings', $setting);
-	}
-
 	// create templates
     $templategroup = array(
         'prefix' => 'archiving',
@@ -138,8 +111,6 @@ function archiving_uninstall()
 	if ($db->field_exists('archiving_inplay', 'forums'))
 		$db->drop_column('forums', 'archiving_inplay');
 
-	$db->delete_query('settings', "name IN('archiving_type')");
-	$db->delete_query('settinggroups', "name = 'archiving'");
 	$db->delete_query("templategroups", 'prefix = "archiving"');
     $db->delete_query("templates", "title like 'archiving_%'");
 
@@ -256,18 +227,14 @@ function archiving_misc()
 		$settings = $db->fetch_array($db->simple_select('forums', 'archiving_inplay, archiving_defaultArchive', 'fid = ' . $old_fid));
 
 		if ($settings['archiving_inplay']) { //wenn inplay nach richtiger kategorie suchen
-			$format = $mybb->settings['archiving_type'];
-			$archiveName;
-			if ($format == 'date') {
-				$ipdate = explode(' ', $thread['ipdate']);
-				$archiveName = $ipdate[1] . ' ' . $ipdate[2];
-			} else {
-				$archiveName = getMonthName(date('m', $thread['ipdate'])) . ' ' . date('Y', $thread['ipdate']);
-			}
+			$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = '. $tid), 'date');
+			setlocale (LC_TIME, 'de_DE');
+			$archiveName = strftime ("%B %G", $ipdate);
 			$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
 			if ($new_fid == null) {
 				$new_fid = $settings['archiving_defaultArchive'];
+				$archiveName = 'Inplayarchiv';
 			}
 		} else {
 			$archiveName = $db->fetch_array($db->simple_select('forums', 'name', 'fid = ' . $settings['archiving_defaultArchive']))['name'];
@@ -366,31 +333,29 @@ function isAllowed($thread) {
 	return false;
 }
 
-function getMonthName($month)
+// admin
+$plugins->add_hook('admin_tools_menu', 'archiving_tools_menu');
+function archiving_tools_menu($sub_menu)
 {
-	if ($month == '01') {
-		return 'Januar';
-	} elseif ($month == '02') {
-		return 'Februar';
-	} elseif ($month == '03') {
-		return 'März';
-	} elseif ($month == '04') {
-		return 'April';
-	} elseif ($month == '05') {
-		return 'Mai';
-	} elseif ($month == '06') {
-		return 'Juni';
-	} elseif ($month == '07') {
-		return 'Juli';
-	} elseif ($month == '08') {
-		return 'August';
-	} elseif ($month == '09') {
-		return 'September';
-	} elseif ($month == '10') {
-		return 'Oktober';
-	} elseif ($month == '11') {
-		return 'November';
-	} elseif ($month == '12') {
-		return 'Dezember';
-	}
+    $ctr = 0;
+
+    while (true) {
+        if ($sub_menu[$ctr] == null) {
+            $sub_menu[$ctr] = array(
+                'id'    => 'archiving',
+                'title'    => 'Acrhivierung',
+                'link'    => 'index.php?module=tools-archiving'
+            );
+            return $sub_menu;
+        } else {
+            $ctr++;
+        }
+    }
+}
+
+$plugins->add_hook('admin_tools_action_handler', 'archiving_tools_action_handler');
+function archiving_tools_action_handler($actions)
+{
+    $actions['archiving'] = array('active' => 'archiving', 'file' => 'archiving.php');
+    return $actions;
 }
