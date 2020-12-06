@@ -308,26 +308,26 @@ function setArchivingButton($thread, $templateName){
 function isAllowed($thread) {
 	global $mybb, $db;
 	$settings = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay', 'fid = ' . $thread['fid']));
-	$partnersString = $db->fetch_array($db->simple_select('threads', 'partners', 'tid = '. $thread['tid']))['partners'];
 	if ($mybb->user['uid'] == 0) return false;
 
+	$query = $db->simple_select('ipt_scenes_partners', 'uid', 'tid = '. $thread['tid']);
+	$partners = array();
+	while($row = $db->fetch_array($query)) {
+		array_push($partners, $row['uid']);
+	}
+
 	if ($settings['archiving_active']) {
+		if ($mybb->usergroup['canmodcp'] == 1) {
+			return true;
+		}
 		if ($settings['archiving_isVisibleForUser']) {
 			if ($settings['archiving_inplay']) { //Berücksichtigung von anderen Szenenteilnehmern
-				$partners = array();
-				$array = explode(',', $partnersString);
-				foreach ($array as $item) {
-					array_push($partners, $item);
-				}
 				if (isOtherAccIPThread($partners)) {
 					return true;
 				}
 			} elseif (isOtherAccThread($thread['uid'])) { //eigenes Thema
 				return true;
 			}
-		}
-		if ($mybb->usergroup['canmodcp'] == 1) {
-			return true;
 		}
 	}
 	return false;
