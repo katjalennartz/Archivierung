@@ -10,7 +10,7 @@ function archiving_info()
 		'description'	=> 'Ermöglicht es Admins einzustellen in welchen Archivbereich das Thema standardmäßig verschoben wird',
 		'author'	=> 'aheartforspinach',
 		'authorsite'	=> 'https://github.com/aheartforspinach',
-		'version'	=> '1.0',
+		'version'	=> '2.0',
 		'compatibility' => '18*'
 	);
 }
