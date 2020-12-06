@@ -1,4 +1,4 @@
-# Archivierung
+# Archivierung 1.0
 Das Plugin erlaubt die leichtere Archivierung von Themen, indem es einen Button hinter den Thementitel anzeigt. Mit einem Klick auf diesen kann man das Thema - ohne die Nutzung des MyBB eigenen Verschiebungstool - in das Standardarchiv verschieben. Das Standardarchiv kann für jede Kategorie einzeln im AdimCP bestimmt werden. Falls man einen Inplaybereich hat, ist es möglich Themen sofort richtig einsortieren zu lassen. 
 
 ## Funktionen
