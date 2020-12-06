@@ -30,7 +30,7 @@ __Funktionen für Admins__
 ## Template-Änderungen
 __Neue Templates:__
 * archiving_button
-archiving_buttonThread
+* archiving_buttonThread
 * archiving_submitSite
 
 __Veränderte Templates:__
