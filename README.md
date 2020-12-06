@@ -28,9 +28,10 @@ __Funktionen für Admins__
 * [Inplaytracker 3.0] muss installiert sein
 
 ## Template-Änderungen
-__Neue globale Templates:__
-* archivingButton
-* archivingSubmitSite
+__Neue Templates:__
+* archiving_button
+archiving_buttonThread
+* archiving_submitSite
 
 __Veränderte Templates:__
 * forumdisplay_thread (wird um die Variable $archivingButton erweitert)
