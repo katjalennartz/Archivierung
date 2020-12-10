@@ -343,7 +343,7 @@ function archiving_tools_menu($sub_menu)
         if ($sub_menu[$ctr] == null) {
             $sub_menu[$ctr] = array(
                 'id'    => 'archiving',
-                'title'    => 'Acrhivierung',
+                'title'    => 'Archivierung',
                 'link'    => 'index.php?module=tools-archiving'
             );
             return $sub_menu;
