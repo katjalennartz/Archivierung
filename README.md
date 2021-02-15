@@ -25,7 +25,7 @@ __Funktionen für Admins__
 ## Voraussetzungen
 * FontAwesome muss eingebunden sein, andernfalls muss man die Icons in dem Template _archivingButton_ ersetzen
 * [Enhanced Account Switcher](http://doylecc.altervista.org/bb/downloads.php?dlid=26&cat=2) muss installiert sein 
-* [Inplaytracker 3.0] muss installiert sein
+* [Inplaytracker 3.0](https://github.com/ItsSparksFly/mybb-inplaytracker/tree/development) muss installiert sein
 
 ## Template-Änderungen
 __Neue Templates:__
@@ -44,7 +44,7 @@ Um die Sprache zu ändern, müsst ihr folgenden Codeabschnitt bearbeiten:
 
 ```setlocale(LC_TIME, 'german');```
 
-Statt "german" den gewünschten String einsetzten. [Siehe hier](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2008/39cwe7zf(v=vs.90)?redirectedfrom=MSDN) für andere Optionen. Englsich wäre "english", französisch "french" und spanisch "spanish"
+Statt "german" den gewünschten String einsetzten. [Siehe hier](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2008/39cwe7zf(v=vs.90)?redirectedfrom=MSDN) für andere Optionen. Englisch wäre "english", französisch "french" und spanisch "spanish"
 
 __Änderung des Formates__
 Um das Format zu ändern, müsst ihr folgenden Codeabschnitt bearbeiten:
