@@ -25,7 +25,7 @@ __Funktionen für Admins__
 ## Voraussetzungen
 * FontAwesome muss eingebunden sein, andernfalls muss man die Icons in dem Template _archivingButton_ ersetzen
 * [Enhanced Account Switcher](http://doylecc.altervista.org/bb/downloads.php?dlid=26&cat=2) muss installiert sein 
-* [Inplaytracker 3.0](https://github.com/ItsSparksFly/mybb-inplaytracker/tree/development) muss installiert sein
+* [Inplaytracker 3.0](https://github.com/ItsSparksFly/mybb-inplaytracker/) muss installiert sein
 
 ## Template-Änderungen
 __Neue Templates:__
