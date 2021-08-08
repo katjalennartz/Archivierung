@@ -228,8 +228,8 @@ function archiving_misc()
 
 		if ($settings['archiving_inplay']) { //wenn inplay nach richtiger kategorie suchen
 			$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = '. $tid), 'date');
-			setlocale(LC_TIME, 'german');
-			$archiveName = strftime ("%B %G", $ipdate);
+			setlocale(LC_TIME, 'de_DE.utf8');
+			$archiveName = strftime("%B %G", $ipdate);
 			$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
 			if ($new_fid == null) {
