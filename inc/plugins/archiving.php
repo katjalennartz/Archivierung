@@ -237,7 +237,7 @@ function archiving_misc()
 
 		if ($new_fid == null) {
 			$new_fid = $settings['archiving_defaultArchive'];
-			$archiveName = 'Inplayarchiv';
+			$archiveName = $db->fetch_field($db->simple_select('forums', 'name', 'fid = '. $new_fid), 'name');
 		}
 	} else {
 		$archiveName = $db->fetch_array($db->simple_select('forums', 'name', 'fid = ' . $settings['archiving_defaultArchive']))['name'];
