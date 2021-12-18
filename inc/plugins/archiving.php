@@ -5,13 +5,9 @@ if (!defined("IN_MYBB")) {
 
 function archiving_info()
 {
-    $option = '';
-    if (archiving_is_installed())
-        $option = '<div style="float: right;"><a href="index.php?module=config&action=change&search=archiving">Einstellungen</a></div>';
-
 	return array(
 		'name'		=> 'Automatische Archivierung',
-		'description'	=> 'Ermöglicht es Admins einzustellen in welchen Archivbereich das Thema standardmäßig verschoben wird'. $option,
+		'description'	=> 'Ermöglicht es Admins einzustellen in welchen Archivbereich das Thema standardmäßig verschoben wird',
 		'author'	=> 'aheartforspinach',
 		'authorsite'	=> 'https://github.com/aheartforspinach',
 		'version'	=> '2.1',
