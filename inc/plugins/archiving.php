@@ -10,7 +10,7 @@ function archiving_info()
 		'description'	=> 'Ermöglicht es Admins einzustellen in welchen Archivbereich das Thema standardmäßig verschoben wird',
 		'author'	=> 'aheartforspinach',
 		'authorsite'	=> 'https://github.com/aheartforspinach',
-		'version'	=> '2.1',
+		'version'	=> '2.2',
 		'compatibility' => '18*'
 	);
 }
@@ -25,12 +25,12 @@ function archiving_install()
 	$db->add_column('forums', 'archiving_inplay', 'tinyint(1) not null default 0');
 
 	// create templates
-    $templategroup = array(
-        'prefix' => 'archiving',
-        'title' => $db->escape_string('Archivierung'),
-    );
+	$templategroup = array(
+		'prefix' => 'archiving',
+		'title' => $db->escape_string('Archivierung'),
+	);
 
-    $db->insert_query("templategroups", $templategroup);
+	$db->insert_query("templategroups", $templategroup);
 
 	$insert_array = array(
 		'title'        => 'archiving_button',
@@ -109,7 +109,7 @@ function archiving_uninstall()
 		$db->drop_column('forums', 'archiving_inplay');
 
 	$db->delete_query("templategroups", 'prefix = "archiving"');
-    $db->delete_query("templates", "title like 'archiving%'");
+	$db->delete_query("templates", "title like 'archiving%'");
 
 	rebuild_settings();
 }
@@ -179,7 +179,7 @@ $plugins->add_hook('forumdisplay_thread', 'archiving_forumdisplay_thread');
 function archiving_forumdisplay_thread()
 {
 	global $archivingButton, $thread, $mybb;
-	if($mybb->user['uid'] == 0) return;
+	if ($mybb->user['uid'] == 0) return;
 	$archivingButton = archiving_setArchivingButton($thread, 'archiving_button');
 }
 
@@ -187,7 +187,7 @@ $plugins->add_hook('showthread_start', 'archiving_showthread_start');
 function archiving_showthread_start()
 {
 	global $archivingButton, $thread, $mybb;
-	if($mybb->user['uid'] == 0) return;
+	if ($mybb->user['uid'] == 0) return;
 	$archivingButton = archiving_setArchivingButton($thread, 'archiving_buttonThread');
 }
 
@@ -226,14 +226,14 @@ function archiving_misc()
 	$settings = archiving_getArchiveSettings($old_fid);
 
 	if ($settings['archiving_inplay']) { // inplay -> search correct category
-		$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = '. $tid), 'date');
+		$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = ' . $tid), 'date');
 		setlocale(LC_TIME, 'de_DE.utf8');
 		$archiveName = strftime("%B %G", $ipdate);
 		$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
 		if ($new_fid == null) {
 			$new_fid = $settings['archiving_defaultArchive'];
-			$archiveName = $db->fetch_field($db->simple_select('forums', 'name', 'fid = '. $new_fid), 'name');
+			$archiveName = $db->fetch_field($db->simple_select('forums', 'name', 'fid = ' . $new_fid), 'name');
 		}
 	} else {
 		$archiveName = $db->fetch_array($db->simple_select('forums', 'name', 'fid = ' . $settings['archiving_defaultArchive']))['name'];
@@ -270,7 +270,7 @@ function archiving_getUidArray()
 	$user = get_user($uid);
 	$mainUid = $user['as_uid'] != 0 ? $user['as_uid'] : $uid;
 
-	$query = $db->simple_select('users', 'uid', 'uid = '. $mainUid.' or as_uid = ' . $mainUid);
+	$query = $db->simple_select('users', 'uid', 'uid = ' . $mainUid . ' or as_uid = ' . $mainUid);
 	$uids = [];
 	while ($row = $db->fetch_array($query)) {
 		if (!in_array($row['uid'], $uids)) $uids[] = $row['uid'];
@@ -278,26 +278,29 @@ function archiving_getUidArray()
 	return $uids;
 }
 
-function archiving_setArchivingButton($thread, $templateName){
-	global $templates;
+function archiving_setArchivingButton($thread, $templateName)
+{
+	global $templates, $lang;
 	if (!archiving_isAllowedToArchive($thread)) {
 		return '';
 	}
 
+	$lang->load('archiving');
 	$fid = $thread['fid'];
 	$tid = $thread['tid'];
 	return eval($templates->render($templateName));
 }
 
-function archiving_getArchiveSettings($fid) {
-	global $db; 
+function archiving_getArchiveSettings($fid)
+{
+	global $db;
 	$settings = $db->fetch_array($db->simple_select('forums', 'archiving_active, archiving_isVisibleForUser, archiving_inplay, archiving_defaultArchive, parentlist', 'fid = ' . $fid));
-	
+
 	// when inactive -> search in parent
 	if ($settings['archiving_active'] == 0) {
 		$parentFids = explode(',', $settings['parentlist']);
 		$parentFid = 0;
-		for (end($parentFids); key($parentFids)!==null; prev($parentFids)) {
+		for (end($parentFids); key($parentFids) !== null; prev($parentFids)) {
 			if ($fid != current($parentFids)) {
 				$parentFid = current($parentFids);
 			}
@@ -309,14 +312,19 @@ function archiving_getArchiveSettings($fid) {
 	return $settings;
 }
 
-function archiving_isAllowedToArchive($thread) {
+function archiving_isAllowedToArchive($thread)
+{
 	global $mybb, $db;
 	if ($mybb->user['uid'] == 0) return false;
 	$settings = archiving_getArchiveSettings($thread['fid']);
 
-	$query = $db->simple_select('ipt_scenes_partners', 'uid', 'tid = '. $thread['tid']);
+	if (!array_key_exists('archiving_active', $settings)) {
+		return false;
+	}
+
+	$query = $db->simple_select('ipt_scenes_partners', 'uid', 'tid = ' . $thread['tid']);
 	$partners = [];
-	while($row = $db->fetch_array($query)) {
+	while ($row = $db->fetch_array($query)) {
 		$partners[] = $row['uid'];
 	}
 
@@ -324,6 +332,7 @@ function archiving_isAllowedToArchive($thread) {
 		if ($mybb->usergroup['canmodcp'] == 1) {
 			return true;
 		}
+
 		if ($settings['archiving_isVisibleForUser']) {
 			if ($settings['archiving_inplay']) { // is participant in inplay scene
 				if (archiving_isUserParticipantInInplayScene($partners)) {
@@ -335,31 +344,4 @@ function archiving_isAllowedToArchive($thread) {
 		}
 	}
 	return false;
-}
-
-// admin
-$plugins->add_hook('admin_tools_menu', 'archiving_tools_menu');
-function archiving_tools_menu($sub_menu)
-{
-    $ctr = 0;
-
-    while (true) {
-        if ($sub_menu[$ctr] == null) {
-            $sub_menu[$ctr] = array(
-                'id'    => 'archiving',
-                'title'    => 'Archivierung',
-                'link'    => 'index.php?module=tools-archiving'
-            );
-            return $sub_menu;
-        } else {
-            $ctr++;
-        }
-    }
-}
-
-$plugins->add_hook('admin_tools_action_handler', 'archiving_tools_action_handler');
-function archiving_tools_action_handler($actions)
-{
-    $actions['archiving'] = array('active' => 'archiving', 'file' => 'archiving.php');
-    return $actions;
 }
