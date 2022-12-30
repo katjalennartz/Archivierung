@@ -134,6 +134,7 @@ function archiving_editForumBox($args)
 	global $lang, $form_container, $form, $mybb, $db;
 
 	$lang->load('archiving');
+	$lang->load('forum_management');
 	if ($args['title'] == $lang->misc_options && $lang->misc_options) {
 		if ($mybb->get_input('action') == 'add') {
 			$data = array(
