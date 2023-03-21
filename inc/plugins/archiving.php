@@ -234,7 +234,7 @@ function archiving_misc()
 			$ipdate = strtotime($ipdate);
 		}
 
-		setlocale(LC_TIME, 'english');
+		setlocale(LC_TIME, 'de_DE.utf8');
 		$archiveName = strftime("%B %G", $ipdate);
 		$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
