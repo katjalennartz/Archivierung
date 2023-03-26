@@ -2,7 +2,7 @@
 Das Plugin erlaubt die leichtere Archivierung von Themen, indem es einen Button hinter den Thementitel anzeigt. Mit einem Klick auf diesen kann man das Thema - ohne die Nutzung des MyBB eigenen Verschiebungstool - in das Standardarchiv verschieben. Das Standardarchiv kann für jede Kategorie einzeln im AdimCP bestimmt werden. Falls man einen Inplaybereich hat, ist es möglich Themen sofort richtig einsortieren zu lassen. 
 
 ## Update
-Dieser Branch unterstützt den Inplaytracker 3.0 von Jule. Falls ihr den Tracker in der Version 2.0 verwendet, müsst ihr [diesen Code](https://github.com/aheartforspinach/Archivierung/tree/version1) herunterladen
+Dieser Branch unterstützt den Inplaytracker 3.0 von Jule und den Inplaytracker von Risuena. Falls ihr Jules Tracker in der Version 2.0 verwendet, müsst ihr [diesen Code](https://github.com/aheartforspinach/Archivierung/tree/version1) herunterladen
 
 __Änderungen zu Version 1.0__
 * Unterstützung des Inplaytracker 3.0
@@ -25,7 +25,7 @@ __Funktionen für Admins__
 ## Voraussetzungen
 * FontAwesome muss eingebunden sein, andernfalls muss man die Icons in dem Template _archivingButton_ ersetzen
 * [Enhanced Account Switcher](http://doylecc.altervista.org/bb/downloads.php?dlid=26&cat=2) muss installiert sein 
-* [Inplaytracker 3.0](https://github.com/ItsSparksFly/mybb-inplaytracker/) muss installiert sein
+* [Inplaytracker 3.0](https://github.com/ItsSparksFly/mybb-inplaytracker/) von Jule oder [Scene tracker](https://github.com/katjalennartz/scenetracker/) von Katja muss installiert sein
 
 ## Template-Änderungen
 __Neue Templates:__
@@ -40,20 +40,7 @@ __Veränderte Templates:__
 Seit der Version 2.0 ist es möglich den Namen der Kategorie selbst zu bestimmen. Nach wie vor muss das Inplayarchiv über Unterforen von jedem Monat verfügen. Standardmäßig ist es eingestellt, dass das Plugin nach "Monatsname YYYY" sucht (deutsche Schreibweise).
 
 __Änderung der Sprache__
-Um die Sprache zu ändern, müsst ihr folgenden Codeabschnitt bearbeiten:
-
-```setlocale(LC_TIME, 'german');```
-
-Statt "german" den gewünschten String einsetzten. [Siehe hier](https://docs.microsoft.com/en-us/previous-versions/visualstudio/visual-studio-2008/39cwe7zf(v=vs.90)?redirectedfrom=MSDN) für andere Optionen. Englisch wäre "english", französisch "french" und spanisch "spanish"
-
-__Änderung des Formates__
-Um das Format zu ändern, müsst ihr folgenden Codeabschnitt bearbeiten:
-
-```$archiveName = strftime ("%B %G", $ipdate);```
-
-Statt "%B %G" könnt ihr mithilfe [dieser Kürzel](https://www.php.net/manual/de/function.strftime.php) ein eigenes Format bestimmen.
-
-![Archivierung Beispiel](https://aheartforspinach.de/upload/plugins/archiving_example.png)
+Um die Sprache zu ändern, sucht nach `$months` und verändert die Monatsnamen in die gewünschte Sprache.
 
 ## Vorschaubilder
 __Einstellungen in der Foren-Editieren-Seite__

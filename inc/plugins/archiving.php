@@ -10,7 +10,7 @@ function archiving_info()
 		'description'	=> 'Ermöglicht es Admins einzustellen in welchen Archivbereich das Thema standardmäßig verschoben wird',
 		'author'	=> 'aheartforspinach',
 		'authorsite'	=> 'https://github.com/aheartforspinach',
-		'version'	=> '2.2',
+		'version'	=> '2.3',
 		'compatibility' => '18*'
 	);
 }
@@ -228,8 +228,21 @@ function archiving_misc()
 
 	if ($settings['archiving_inplay']) { // inplay -> search correct category
 		$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = ' . $tid), 'date');
-		setlocale(LC_TIME, 'de_DE.utf8');
-		$archiveName = strftime("%B %G", $ipdate);
+		$months = [
+            1 => 'January',
+            2 => 'February',
+            3 => 'March',
+            4 => 'April',
+            5 => 'May',
+            6 => 'June',
+            7 => 'July',
+            8 => 'August',
+            9 => 'September',
+            10 => 'October',
+            11 => 'November',
+            12 => 'December',
+        ];                                          
+        $archiveName = $months[date('n', $ipdate)] . date(' Y', $ipdate);
 		$new_fid = $db->fetch_array($db->simple_select('forums', 'fid', 'name = "' . $archiveName . '"'))['fid'];
 
 		if ($new_fid == null) {
