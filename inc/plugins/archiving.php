@@ -227,7 +227,14 @@ function archiving_misc()
 	$settings = archiving_getArchiveSettings($old_fid);
 
 	if ($settings['archiving_inplay']) { // inplay -> search correct category
-		$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = ' . $tid), 'date');
+		$ipdate = '';
+		if ($db->table_exists("ipt_scenes")) {
+			$ipdate = $db->fetch_field($db->simple_select('ipt_scenes', 'date', 'tid = ' . $tid), 'date');
+		} elseif ($db->table_exists("scenetracker")) {
+			$ipdate = $db->fetch_field($db->simple_select('threads', 'scenetracker_date', 'tid = ' . $tid), 'scenetracker_date');
+			$ipdate = strtotime($ipdate);
+		}
+
 		$months = [
             1 => 'January',
             2 => 'February',
@@ -336,10 +343,20 @@ function archiving_isAllowedToArchive($thread)
 		return false;
 	}
 
-	$query = $db->simple_select('ipt_scenes_partners', 'uid', 'tid = ' . $thread['tid']);
+	$query = '';
+	if ($db->table_exists('ipt_scenes_partners')) {
+		$query = $db->simple_select('ipt_scenes_partners', 'uid', 'tid = ' . $thread['tid']);
+	} elseif ($db->table_exists('scenetracker')) {
+		$query = $db->fetch_field($db->simple_select('threads', 'scenetracker_user', 'tid = ' . $thread['tid']), "scenetracker_user");
+	}
+
 	$partners = [];
-	while ($row = $db->fetch_array($query)) {
-		$partners[] = $row['uid'];
+	if ($db->table_exists('ipt_scenes_partners')) {
+		while ($row = $db->fetch_array($query)) {
+			$partners[] = $row['uid'];
+		}
+	} elseif ($db->table_exists('scenetracker')) {
+		$partners = explode(",", $query);
 	}
 
 	if ($settings['archiving_active']) {
