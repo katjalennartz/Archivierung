@@ -357,9 +357,10 @@ function archiving_isAllowedToArchive($thread)
 		}
 	} elseif ($db->table_exists('scenetracker')) {
 		$partners_name = explode(",", $query);
+		
 		foreach($partners_name as $name) {
-			$partneris = get_user_by_username($name);
-			$partners[] = $partneris['uid'];
+			$partner = get_user_by_username($name);
+			$partners[] = $partner['uid'];
 		}
 	}
 
